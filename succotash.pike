@@ -3,6 +3,11 @@
 //drawing on the root), or it could just be that I'm misunderstanding
 //what's going on. Hrm.
 
+/* The theory here was to be able to "point" to someone else's screen.
+It may be possible to create an always-on-top window that is mostly
+transparent, but this may depend on display compositing. Does that even
+exist on non-Linux platforms? */
+
 int main()
 {
 	GTK2.setup_gtk();
