@@ -8,6 +8,12 @@ It may be possible to create an always-on-top window that is mostly
 transparent, but this may depend on display compositing. Does that even
 exist on non-Linux platforms? */
 
+/* Alternatively, could move the pointer thus:
+GTK2.move_cursor_abs(root, 300,300); //disp->get_pointer();
+The get_pointer is critical if no backend is active. I don't understand
+this, but presumably the actual movement happens in an event loop.
+*/
+
 int main()
 {
 	GTK2.setup_gtk();
