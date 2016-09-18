@@ -13,19 +13,32 @@ GTK2.move_cursor_abs(root, 300,300); //disp->get_pointer();
 The get_pointer is critical if no backend is active. I don't understand
 this, but presumably the actual movement happens in an event loop.
 */
+object root;
+void make_marker(int x, int y)
+{
+	//Note that gravity doesn't apply to non-decorated windows.
+	object win = GTK2.Window((["decorated": 0, "gravity": GTK2.GDK_GRAVITY_CENTER]))
+		->add(GTK2.Label("Demo"))
+		->move(x, y)
+		->show_all();
+	GTK2.move_cursor_abs(root, x, y);
+}
 
 int main()
 {
 	GTK2.setup_gtk();
 	object scrn = GTK2.GdkScreen();
-	object root = scrn->get_root_window();
+	root = scrn->get_root_window();
 	write("scrn %O root %O\n", scrn, root);
 	object gc = GTK2.GdkGC(root);
 	write("gc %O\n", gc);
 	//root->draw_text(gc, 100, 100, "Hello, world!");
 	//root->draw_text(gc, 2000, 100, "Hello, world!");
-	gc->set_foreground( GDK2.Color(255,0,0) );
+
+	/*gc->set_foreground( GDK2.Color(255,0,0) );
 	root->draw_line(gc, 0, 0, 500, 500);
-	root->draw_line(gc, 2000, 0, 2500, 500);
-	//return -1;
+	root->draw_line(gc, 2000, 0, 2500, 500);*/
+
+	call_out(make_marker, 2, 100, 100);
+	return -1;
 }
