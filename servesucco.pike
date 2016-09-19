@@ -37,7 +37,7 @@ string(0..255) succotash(mapping(string:mixed) conn,string(0..255) line)
 		if (sscanf(line, "id %s", conn->id))
 		{
 			//You may choose your own ID only before joining a room.
-			return "OK Your ID is now: " + conn->id;
+			return "OK Your ID is: " + conn->id;
 		}
 		if (sscanf(line, "room %s", conn->room))
 		{
