@@ -50,8 +50,9 @@ void make_marker(int x, int y)
 		->modify_bg(GTK2.STATE_NORMAL, colors[0])
 		->move(x-XMID, y-YMID)
 		->shape_combine_mask(empty, 0, 0)
+		->show_all()
 		->set_keep_above(1)
-		->show_all();
+	;
 	//GTK2.move_cursor_abs(root, x, y);
 	cycle(win);
 }
