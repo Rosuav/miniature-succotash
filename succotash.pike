@@ -20,11 +20,22 @@ array(Image.Image) circles = allocate(XMID);
 array(GTK2.GdkBitmap) circlebmp;
 GTK2.GdkBitmap empty;
 
-void cycle(object win, int pos)
+//Borrowed from Gypsum
+array bits = map(enumerate(8),lambda(int x) {return ({x&1,!!(x&2),!!(x&4)});});
+array color_defs = bits[*][*]*255;
+array colors;
+
+void cycle(object win, int|void pos, int|void col)
 {
 	if (!win) return; //Window is gone.
-	call_out(cycle, 0.01, win, pos + 1);
-	win->shape_combine_mask(circlebmp[pos % XMID], 0, 0);
+	if (pos == XMID)
+	{
+		pos = 0;
+		col = (col + 1) % sizeof(colors);
+		win->modify_bg(GTK2.STATE_NORMAL, colors[col]);
+	}
+	win->shape_combine_mask(circlebmp[pos], 0, 0);
+	call_out(cycle, 0.01, win, pos + 1, col);
 }
 
 void make_marker(int x, int y)
@@ -36,13 +47,13 @@ void make_marker(int x, int y)
 		]))
 		//->add(GTK2.Label("Demo"))
 		->resize(XSIZE, YSIZE)
-		->modify_bg(GTK2.STATE_NORMAL, GTK2.GdkColor(0, 0, 255))
+		->modify_bg(GTK2.STATE_NORMAL, colors[0])
 		->move(x-XMID, y-YMID)
 		->shape_combine_mask(empty, 0, 0)
 		->set_keep_above(1)
 		->show_all();
 	//GTK2.move_cursor_abs(root, x, y);
-	cycle(win, 0);
+	cycle(win);
 }
 
 int main()
@@ -54,6 +65,7 @@ int main()
 	GTK2.setup_gtk();
 	circlebmp = GTK2.GdkBitmap(circles[*]);
 	empty = GTK2.GdkBitmap(1, 1, "\0");
+	colors = Function.splice_call(color_defs[*],GTK2.GdkColor);
 	/*object scrn = GTK2.GdkScreen();
 	root = scrn->get_root_window();
 	write("scrn %O root %O\n", scrn, root);
