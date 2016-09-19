@@ -19,6 +19,7 @@ constant XMID = XSIZE/2, YMID = YSIZE/2; //Used very frequently
 array(Image.Image) circles = allocate(XMID);
 array(GTK2.GdkBitmap) circlebmp;
 GTK2.GdkBitmap empty;
+mapping(string:GTK2.Window) markers = ([]);
 
 //Borrowed from Gypsum
 array bits = map(enumerate(8),lambda(int x) {return ({x&1,!!(x&2),!!(x&4)});});
@@ -38,10 +39,10 @@ void cycle(object win, int|void pos, int|void col)
 	call_out(cycle, 0.01, win, pos + 1, col);
 }
 
-void make_marker(int x, int y)
+void make_marker(string id, int x, int y)
 {
 	//Note that gravity doesn't apply to non-decorated windows.
-	object win = GTK2.Window(([
+	markers[id] = GTK2.Window(([
 			"decorated": 0, "accept-focus": 0,
 			"skip-pager-hint": 1, "skip-taskbar-hint": 1,
 		]))
@@ -54,7 +55,7 @@ void make_marker(int x, int y)
 		->set_keep_above(1)
 	;
 	//GTK2.move_cursor_abs(root, x, y);
-	cycle(win);
+	cycle(markers[id]);
 }
 
 int main()
@@ -79,7 +80,7 @@ int main()
 	root->draw_line(gc, 0, 0, 500, 500);
 	root->draw_line(gc, 2000, 0, 2500, 500);*/
 
-	call_out(make_marker, 2, 100, 100);
+	call_out(make_marker, 2, "demo", 100, 100);
 	write("Demo is active - Ctrl-C to halt\n");
 	return -1;
 }
