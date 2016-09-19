@@ -14,19 +14,46 @@ The get_pointer is critical if no backend is active. I don't understand
 this, but presumably the actual movement happens in an event loop.
 */
 object root;
+constant XSIZE = 50, YSIZE = 50; //NOTE: Some things may not work if it's not square. Untested.
+constant XMID = XSIZE/2, YMID = YSIZE/2; //Used very frequently
+array(Image.Image) circles = allocate(XMID);
+array(GTK2.GdkBitmap) circlebmp;
+GTK2.GdkBitmap empty;
+
+void cycle(object win, int pos)
+{
+	if (!win) return; //Window is gone.
+	call_out(cycle, 0.01, win, pos + 1);
+	win->shape_combine_mask(circlebmp[pos % XMID], 0, 0);
+}
+
 void make_marker(int x, int y)
 {
 	//Note that gravity doesn't apply to non-decorated windows.
-	object win = GTK2.Window((["decorated": 0, "gravity": GTK2.GDK_GRAVITY_CENTER]))
-		->add(GTK2.Label("Demo"))
-		->move(x, y)
+	object win = GTK2.Window(([
+			"decorated": 0, "accept-focus": 0,
+			"skip-pager-hint": 1, "skip-taskbar-hint": 1,
+		]))
+		//->add(GTK2.Label("Demo"))
+		->resize(XSIZE, YSIZE)
+		->modify_bg(GTK2.STATE_NORMAL, GTK2.GdkColor(0, 0, 255))
+		->move(x-XMID, y-YMID)
+		->shape_combine_mask(empty, 0, 0)
+		->set_keep_above(1)
 		->show_all();
-	GTK2.move_cursor_abs(root, x, y);
+	//GTK2.move_cursor_abs(root, x, y);
+	cycle(win, 0);
 }
 
 int main()
 {
+	for (int i=0; i<XMID; ++i)
+		circles[i] = Image.Image(XSIZE, YSIZE)
+			->setcolor(255, 255, 255)
+			->circle(XMID, YMID, i, i);
 	GTK2.setup_gtk();
+	circlebmp = GTK2.GdkBitmap(circles[*]);
+	empty = GTK2.GdkBitmap(1, 1, "\0");
 	object scrn = GTK2.GdkScreen();
 	root = scrn->get_root_window();
 	write("scrn %O root %O\n", scrn, root);
@@ -40,5 +67,6 @@ int main()
 	root->draw_line(gc, 2000, 0, 2500, 500);*/
 
 	call_out(make_marker, 2, 100, 100);
+	write("Demo is active - Ctrl-C to halt\n");
 	return -1;
 }
