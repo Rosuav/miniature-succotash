@@ -12,6 +12,8 @@ exist on non-Linux platforms? */
 GTK2.move_cursor_abs(root, 300,300); //disp->get_pointer();
 The get_pointer is critical if no backend is active. I don't understand
 this, but presumably the actual movement happens in an event loop.
+NOTE: Does not work on Windows + Pike 8.0 + GTK 2.12.11. No idea which
+part of that causes the problem.
 */
 object root;
 constant XSIZE = 50, YSIZE = 50; //NOTE: Some things may not work if it's not square. Untested.
