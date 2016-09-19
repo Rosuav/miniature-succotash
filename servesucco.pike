@@ -32,6 +32,11 @@ string(0..255) succotash(mapping(string:mixed) conn,string(0..255) line)
 		}
 		return 0;
 	}
+	if (line == "quit")
+	{
+		conn->_close = 1;
+		return "OK Bye! [00:08:53]";
+	}
 	if (conn->state == "room")
 	{
 		if (sscanf(line, "id %s", conn->id))
@@ -52,11 +57,6 @@ string(0..255) succotash(mapping(string:mixed) conn,string(0..255) line)
 	{
 		G->send(connections[conn->room][*], sprintf("POS %s %d %d", conn->id, x, y));
 		return 0; //The echo of POS should be enough.
-	}
-	if (line == "quit")
-	{
-		conn->_close = 1;
-		return "OK Bye! [00:08:53]";
 	}
 	return "BAD Unrecognized command.";
 }
