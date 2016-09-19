@@ -54,11 +54,11 @@ int main()
 	GTK2.setup_gtk();
 	circlebmp = GTK2.GdkBitmap(circles[*]);
 	empty = GTK2.GdkBitmap(1, 1, "\0");
-	object scrn = GTK2.GdkScreen();
+	/*object scrn = GTK2.GdkScreen();
 	root = scrn->get_root_window();
 	write("scrn %O root %O\n", scrn, root);
 	object gc = GTK2.GdkGC(root);
-	write("gc %O\n", gc);
+	write("gc %O\n", gc);*/
 	//root->draw_text(gc, 100, 100, "Hello, world!");
 	//root->draw_text(gc, 2000, 100, "Hello, world!");
 
