@@ -20,6 +20,7 @@ string(0..255) succotash(mapping(string:mixed) conn,string(0..255) line)
 		if (!conn->_closing)
 		{
 			conn->state = "room";
+			//TODO: Guarantee uniqueness (just in case - it's pretty unlikely we'll get collisions)
 			conn->id = MIME.encode_base64(random_string(6));
 			return "OK Welcome, please select a room. Your ID is: " + conn->id;
 		}
