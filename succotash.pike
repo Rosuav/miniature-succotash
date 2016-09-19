@@ -15,6 +15,16 @@ this, but presumably the actual movement happens in an event loop.
 NOTE: Does not work on Windows + Pike 8.0 + GTK 2.12.11. No idea which
 part of that causes the problem.
 */
+
+/*
+TODO: Rescale everything to a consistent coordinate system. Best bet is
+probably to craft a mythical pixel resolution like 65536x65536 and scale
+everything to that; effectively, the network protocol would then be in
+"proportions of the screen" rather than actual pixels. Then if we could
+just get from Project Owl a bounding rectangle, we could use that instead
+of the actual screen position, and voila! Perfect "point to screen share"
+facilities, as long as Succotash is running on both ends.
+*/
 object root;
 constant XSIZE = 50, YSIZE = 50; //NOTE: Some things may not work if it's not square. Untested.
 constant XMID = XSIZE/2, YMID = YSIZE/2; //Used very frequently
