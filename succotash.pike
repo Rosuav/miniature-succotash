@@ -22,6 +22,7 @@ array(Image.Image) circles = allocate(XMID);
 array(GTK2.GdkBitmap) circlebmp;
 GTK2.GdkBitmap empty;
 mapping(string:GTK2.Window) markers = ([]);
+Stdio.File sock;
 
 //Borrowed from Gypsum
 array bits = map(enumerate(8),lambda(int x) {return ({x&1,!!(x&2),!!(x&4)});});
@@ -60,8 +61,38 @@ void make_marker(string id, int x, int y)
 	cycle(markers[id]);
 }
 
+string sockbuf = "";
+string my_id;
+void socketread(mixed id, string data)
+{
+	sockbuf += data;
+	while (sscanf(sockbuf, "%s\n%s", string line, sockbuf))
+	{
+		if (sscanf(line, "OK %*sYour ID is: %s", my_id) == 2)
+			write("My ID is: %s\n", my_id);
+		if (sscanf(line, "POS %s %d %d", string id, int x, int y))
+		{
+			if (id == my_id) continue; //Don't show a marker for ourselves
+			object win = markers[id];
+			if (!win) make_marker(id, x, y);
+			else win->move(x-XMID, y-YMID);
+		}
+		else if (sscanf(line, "GONE %s", string id))
+		{
+			object win = markers[id];
+			if (!win) continue;
+			win->destroy();
+			destruct(win);
+		}
+	}
+}
+
 int main()
 {
+	sock = Stdio.File();
+	sock->connect("gideon.rosuav.com", 42857);
+	sock->write("room demo\n");
+	sock->set_read_callback(socketread);
 	for (int i=0; i<XMID; ++i)
 		circles[i] = Image.Image(XSIZE, YSIZE)
 			->setcolor(255, 255, 255)
