@@ -23,6 +23,7 @@ array(GTK2.GdkBitmap) circlebmp;
 GTK2.GdkBitmap empty;
 mapping(string:GTK2.Window) markers = ([]);
 Stdio.File sock;
+GTK2.GdkDisplay disp;
 
 //Borrowed from Gypsum
 array bits = map(enumerate(8),lambda(int x) {return ({x&1,!!(x&2),!!(x&4)});});
@@ -87,6 +88,15 @@ void socketread(mixed id, string data)
 	}
 }
 
+int last_x=-1, last_y=-1;
+void check_cursor_pos()
+{
+	call_out(check_cursor_pos, 0.1); //Max ten checks per second, to reduce network bandwidth
+	mapping pos = disp->get_pointer();
+	if (last_x == pos->x && last_y == pos->y) return;
+	sock->write(sprintf("pos %d %d\n", last_x = pos->x, last_y = pos->y));
+}
+
 int main()
 {
 	sock = Stdio.File();
@@ -101,6 +111,7 @@ int main()
 	circlebmp = GTK2.GdkBitmap(circles[*]);
 	empty = GTK2.GdkBitmap(1, 1, "\0");
 	colors = Function.splice_call(color_defs[*],GTK2.GdkColor);
+	disp = GTK2.GdkDisplay();
 	/*object scrn = GTK2.GdkScreen();
 	root = scrn->get_root_window();
 	write("scrn %O root %O\n", scrn, root);
@@ -114,6 +125,9 @@ int main()
 	root->draw_line(gc, 2000, 0, 2500, 500);*/
 
 	call_out(make_marker, 2, "demo", 100, 100);
+	//Not sure if it's possible (or even desirable) to get a motion-notify
+	//event, so for now, we just poll for the cursor.
+	check_cursor_pos();
 	write("Demo is active - Ctrl-C to halt\n");
 	return -1;
 }
