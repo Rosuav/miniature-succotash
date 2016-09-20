@@ -58,6 +58,11 @@ string(0..255) succotash(mapping(string:mixed) conn,string(0..255) line)
 		G->send(connections[conn->room][*], sprintf("POS %s %d %d", conn->id, x, y));
 		return 0; //The echo of POS should be enough.
 	}
+	if (line == "hide")
+	{
+		G->send(connections[conn->room][*], "GONE " + conn->id);
+		return 0; //Again, just the echo should be enough
+	}
 	return "BAD Unrecognized command.";
 }
 
