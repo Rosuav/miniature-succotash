@@ -134,7 +134,7 @@ int main()
 	root->draw_line(gc, 0, 0, 500, 500);
 	root->draw_line(gc, 2000, 0, 2500, 500);*/
 
-	call_out(make_marker, 2, "demo", 100, 100);
+	//call_out(make_marker, 2, "demo", 100, 100);
 	//Not sure if it's possible (or even desirable) to get a motion-notify
 	//event, so for now, we just poll for the cursor.
 	check_cursor_pos();
