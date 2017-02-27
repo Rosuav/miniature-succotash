@@ -24,6 +24,10 @@ everything to that; effectively, the network protocol would then be in
 just get from Project Owl a bounding rectangle, we could use that instead
 of the actual screen position, and voila! Perfect "point to screen share"
 facilities, as long as Succotash is running on both ends.
+
+NOTE: The scaling is not meant to be absolutely perfect, nor will it ever
+reverse precisely. As long as it's within a pixel or so of where you want
+it, it'll look fine.
 */
 object root;
 constant XSIZE = 50, YSIZE = 50; //NOTE: Some things may not work if it's not square. Untested.
@@ -33,7 +37,9 @@ array(GTK2.GdkBitmap) circlebmp;
 GTK2.GdkBitmap empty;
 mapping(string:GTK2.Window) markers = ([]);
 Stdio.File sock;
+GTK2.GdkScreen scrn;
 GTK2.GdkDisplay disp;
+mapping monitor_geometry = ([]);
 
 //Borrowed from Gypsum
 array bits = map(enumerate(8),lambda(int x) {return ({x&1,!!(x&2),!!(x&4)});});
@@ -84,6 +90,10 @@ void socketread(mixed id, string data)
 		if (sscanf(line, "POS %s %d %d", string id, int x, int y))
 		{
 			if (id == my_id) continue; //Don't show a marker for ourselves
+			//write("New pos %s -> %d,%d ==> ", id, x, y);
+			x = x * monitor_geometry->width / 65536 + monitor_geometry->left;
+			y = y * monitor_geometry->height / 65536 + monitor_geometry->top;
+			//write("%d,%d\n", x, y);
 			object win = markers[id];
 			if (!win) make_marker(id, x, y);
 			else win->move(x-XMID, y-YMID);
@@ -103,8 +113,13 @@ void check_cursor_pos()
 {
 	call_out(check_cursor_pos, 0.1); //Max ten checks per second, to reduce network bandwidth
 	mapping pos = disp->get_pointer();
-	if (last_x == pos->x && last_y == pos->y) return;
-	sock->write(sprintf("pos %d %d\n", last_x = pos->x, last_y = pos->y));
+	int mon = scrn->get_monitor_at_point(pos->x, pos->y); //Always 0 if only one monitor.
+	monitor_geometry = (mapping)scrn->get_monitor_geometry(mon);
+	int x = (pos->x - monitor_geometry->left) * 65536 / monitor_geometry->width;
+	int y = (pos->y - monitor_geometry->top) * 65536 / monitor_geometry->height;
+	if (last_x == x && last_y == y) return;
+	//write("%d(%d,%d) -> (%d,%d)\n", mon, pos->x, pos->y, x, y);
+	sock->write(sprintf("pos %d %d\n", last_x = x, last_y = y));
 }
 
 int main()
@@ -122,8 +137,8 @@ int main()
 	empty = GTK2.GdkBitmap(1, 1, "\0");
 	colors = Function.splice_call(color_defs[*],GTK2.GdkColor);
 	disp = GTK2.GdkDisplay();
-	/*object scrn = GTK2.GdkScreen();
-	root = scrn->get_root_window();
+	scrn = GTK2.GdkScreen();
+	/*root = scrn->get_root_window();
 	write("scrn %O root %O\n", scrn, root);
 	object gc = GTK2.GdkGC(root);
 	write("gc %O\n", gc);*/
