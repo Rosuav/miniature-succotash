@@ -110,7 +110,7 @@ void check_cursor_pos()
 int main()
 {
 	sock = Stdio.File();
-	sock->connect("gideon.rosuav.com", 42857);
+	sock->connect("ipv4.rosuav.com", 42857);
 	sock->write("room demo\n");
 	sock->set_read_callback(socketread);
 	for (int i=0; i<XMID; ++i)
