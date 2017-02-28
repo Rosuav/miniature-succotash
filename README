@@ -1,3 +1,7 @@
 To install on Windows, download and run this:
 
 https://rosuav.github.io/miniature-succotash/install_on_windows.bat
+
+To install on Mac OS, paste this into Terminal:
+
+curl http://rosuav.github.io/miniature-succotash/install_on_macos.sh | /bin/bash
