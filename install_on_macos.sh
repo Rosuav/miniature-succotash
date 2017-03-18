@@ -12,7 +12,7 @@ get_xquartz() {
 	XML_FEED="https://www.xquartz.org/releases/sparkle/release.xml"
 	URL=`curl -sfL "$XML_FEED" | tr -s ' ' '\012' | grep 'url=' | head -1 | awk -F'"' '/^/{print $2}'`
 	FILENAME=/tmp/XQuartz.dmg
-	curl -L#o $FILENAME $URL
+	curl '-L#o' $FILENAME $URL
 	# Mount point detection taken from the above script also. Couldn't this be done more simply
 	# using the non-plist output of hdid?
 	MNTPNT=$(echo -n "Y" | hdid -plist "$FILENAME" 2>/dev/null | fgrep -A 1 '<key>mount-point</key>' | tail -1 | sed 's#</string>.*##g ; s#.*<string>##g')
